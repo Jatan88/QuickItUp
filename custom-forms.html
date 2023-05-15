@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HTML Code Generator</title>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
+    <link rel="stylesheet" href="cs-styles.css">
+
+</head>
+<body>
+	<h1>HTML Code Generator</h1>
+	<form id="form">
+		<label for="form-type">Select a form type:</label>
+		<select id="form-type" name="form-type">
+			<option value="login">Login Form</option>
+			<option value="contact">Contact Form</option>
+		</select>
+		<br><br>
+		<label>Fields:</label>
+		<input type="checkbox" id="username" name="fields" value="username">
+		<label for="username">Username</label>
+		<input type="checkbox" id="password" name="fields" value="password">
+		<label for="password">Password</label>
+		<input type="checkbox" id="email" name="fields" value="email">
+		<label for="email">Email</label>
+		<br><br>
+		<button type="button" id="generate">Generate HTML Code</button>
+	</form>
+	<br><br>
+	<div id="preview"></div>
+
+	<!-- Handlebars template -->
+	<script id="template" type="text/x-handlebars-template">
+		<h2>{{ form_type }} Form</h2>
+		<form>
+			{{#each fields}}
+				<label for="{{ this }}">{{ this }}:</label>
+				<input type="text" id="{{ this }}" name="{{ this }}"><br>
+			{{/each}}
+			<input type="submit" value="Submit">
+		</form>
+		<br><br>
+		<textarea rows="10" cols="50">{{ html }}</textarea>
+	</script>
+
+	<script>
+		// Handle form submission
+		$('#generate').on('click', function() {
+			// Get form data
+			var formType = $('#form-type').val();
+			var fields = $('input[name="fields"]:checked').map(function() {
+				return this.value;
+			}).get();
+
+			// Generate HTML code using Handlebars template
+			var source = $('#template').html();
+			var template = Handlebars.compile(source);
+			var html = template({ form_type: formType, fields: fields, html: generateHtml(formType, fields) });
+
+			// Display HTML code in preview area
+			$('#preview').html(html);
+		});
+
+		// Generate HTML code
+		function generateHtml(formType, fields) {
+			var html = '<h2>' + formType + ' Form</h2>\n';
+			html += '<form>\n';
+			fields.forEach(function(field) {
+				html += '\t<label for="' + field + '">' + field + ':</label>\n';
+				html += '\t<input type="text" id="' + field + '" name="' + field + '"><br>\n';
+			});
+			html += '\t<input type="submit" value="Submit">\n';
+			html += '</form>\n';
+			return html;
+		}
+	</script>
+</body>
+</html>
